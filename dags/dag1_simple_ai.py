@@ -4,7 +4,7 @@ from airflow import DAG
 from airflow.sdk import task
 
 with DAG(
-    dag_id="gemini_test",
+    dag_id="ai_test",
     schedule=None,
     start_date=datetime(2024, 1, 1),
     catchup=False,
