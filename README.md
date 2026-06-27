@@ -48,11 +48,44 @@
 
 ---
 
+## การตั้งค่าและใช้งานการแจ้งเตือน (Messaging & Callbacks)
+
+โปรเจกต์นี้สาธิตเวิร์กโฟลว์การส่งการแจ้งเตือนผ่าน **LINE** และ **Telegram** ทั้งในรูปแบบ Task ปกติและในรูปแบบ Callback เมื่อ DAG ทำงานสำเร็จหรือล้มเหลว:
+
+- **`dags/dag3_simple_ai_with_param_and_line.py` (DAG: `LINE_simple_ai`)**: 
+  เรียกใช้งาน LINE Messaging API ผ่าน HTTP POST Request เป็น Task หนึ่งในเวิร์กโฟลว์ เพื่อส่งคำถามของฝั่งผู้ใช้และคำตอบของ Gemini เข้าห้องแชท LINE
+
+- **`dags/dag4_simple_ai_with_param_callback.py` (DAG: `LINE_simple_ai_with_callback`)**: 
+  ใช้ `on_success_callback` และ `on_failure_callback` ในการดึงผลลัพธ์คำตอบจาก XCom และส่งข้อมูลแจ้งเตือนสถานะความสำเร็จ/ความล้มเหลวของการรัน Pipeline ไปยัง LINE (ไม่ต้องสร้าง Task ส่งข้อมูลแยกต่างหาก)
+
+- **`dags/dag5_ai_spam_filter_telegram.py` (DAG: `Telegram_ai_spam_filter`)**: 
+  เรียกใช้ `on_success_callback` และ `on_failure_callback` ผ่าน **`TelegramHook`** ของ Airflow เพื่อสรุปผลลัพธ์การประเมินสแปม (จาก XCom) และส่งข้อมูลสถานะการรัน Pipeline ไปยัง Telegram
+
+### การเตรียมบัญชีและข้อมูลสำหรับ LINE และ Telegram
+
+#### 1. LINE Messaging API
+- สมัครและสร้าง **LINE Official Account (Provider & Channel)** โดยปฏิบัติตามคำแนะนำอย่างละเอียดที่ [LINE Developers: Getting started with the Messaging API](https://developers.line.biz/en/docs/messaging-api/getting-started/)
+- เมื่อตั้งค่าเสร็จสิ้น ให้เปิดใช้งานแชท และคัดลอก **Channel Access Token** มาใช้เป็น `LINE_CHANNEL_ACCESS_TOKEN`
+- ใช้ ID ห้องแชทของผู้ใช้/กลุ่มที่ระบุในแผงควบคุม LINE Developers มาใช้เป็น `LINE_TARGET_ID`
+
+#### 2. Telegram Bot
+- คุยกับ [@BotFather](https://t.me/BotFather) ในแอปพลิเคชัน Telegram เพื่อสร้างบอทใหม่ด้วยการส่งคำสั่ง `/newbot` จากนั้นคัดลอก **HTTP API Token** ที่ได้มาใช้งาน
+- ค้นหา **User ID** หรือ **Group ID** ของคุณได้โดยการคุยกับ [@userinfobot](https://t.me/userinfobot) (หากแชทกลุ่มให้เชิญบอทดังกล่าวหรือบอทหา ID เข้าไปในกลุ่ม) *หมายเหตุ: ID ของห้องแชทกลุ่ม (Group Chat ID) ใน Telegram จะขึ้นต้นด้วยเครื่องหมายติดลบ (เช่น -100xxxxxxxxxx)*
+- **การตั้งค่าใน Airflow**:
+  - ไปที่หน้าควบคุม Airflow Console -> **Admin** -> **Connections**
+  - สร้าง Connection ใหม่โดยตั้งชื่อ Conn Id เป็น `telegram_default`
+  - เลือก Connection Type เป็น `Telegram`
+  - นำ **User ID / Group ID** ใส่ไว้ที่ช่อง **`Host`**
+  - นำ **Telegram Bot Token** ใส่ไว้ที่ช่อง **`Password`**
+
+---
+
 ## ทดลองการแจ้งเตือน `messaging/`
+
 
 โปรเจกต์นี้รองรับการแจ้งเตือนผลการรันหรือส่งข้อความผ่านแอปพลิเคชัน **LINE** และ **Telegram**
 
-### การตั้งค่า secret สำหรับ messaging ฟยย
+### การตั้งค่า secret สำหรับ messaging
 
 สร้างไฟล์ `.env` ในโฟลเดอร์ `messaging/` (อ้างอิงรูปแบบจาก `.env.example`) เพื่อเก็บค่า Credentials:
 
