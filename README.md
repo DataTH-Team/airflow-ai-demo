@@ -55,11 +55,32 @@
 - **`dags/dag3_simple_ai_with_param_and_line.py` (DAG: `LINE_simple_ai`)**: 
   เรียกใช้งาน LINE Messaging API ผ่าน HTTP POST Request เป็น Task หนึ่งในเวิร์กโฟลว์ เพื่อส่งคำถามของฝั่งผู้ใช้และคำตอบของ Gemini เข้าห้องแชท LINE
 
+  ```mermaid
+  graph LR
+      classDef ai fill:#E3F2FD,stroke:#2196F3,stroke-width:2px,color:#0D47A1;
+      classDef process fill:#FFF3E0,stroke:#FF9800,stroke-width:2px,color:#E65100;
+      classDef notification fill:#F1F8E9,stroke:#7CB342,stroke-width:2px,color:#33691E;
+
+      A[ask_gemini]
+      B[print_answer]
+      C[send_to_line]
+
+      A -->|"String (Response)"| B
+      A -->|"String (Response)"| C
+
+      class A ai;
+      class B process;
+      class C notification;
+  ```
+
 - **`dags/dag4_simple_ai_with_param_callback.py` (DAG: `LINE_simple_ai_with_callback`)**: 
   ใช้ `on_success_callback` และ `on_failure_callback` ในการดึงผลลัพธ์คำตอบจาก XCom และส่งข้อมูลแจ้งเตือนสถานะความสำเร็จ/ความล้มเหลวของการรัน Pipeline ไปยัง LINE (ไม่ต้องสร้าง Task ส่งข้อมูลแยกต่างหาก)
+  *(หมายเหตุ: โครงสร้าง Task Flow ของ DAG นี้จะเหมือนกับ **`dag1`** ทุกประการ เนื่องจากทำงานผ่าน Callback ในเบื้องหลัง)*
 
 - **`dags/dag5_ai_spam_filter_telegram.py` (DAG: `Telegram_ai_spam_filter`)**: 
   เรียกใช้ `on_success_callback` และ `on_failure_callback` ผ่าน **`TelegramHook`** ของ Airflow เพื่อสรุปผลลัพธ์การประเมินสแปม (จาก XCom) และส่งข้อมูลสถานะการรัน Pipeline ไปยัง Telegram
+  *(หมายเหตุ: โครงสร้าง Task Flow ของ DAG นี้จะเหมือนกับ **`dag2`** ทุกประการ เนื่องจากใช้กลไก Callback ในการแจ้งเตือน)*
+
 
 ### การเตรียมบัญชีและข้อมูลสำหรับ LINE และ Telegram
 
