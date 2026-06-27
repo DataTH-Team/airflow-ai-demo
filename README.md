@@ -45,3 +45,29 @@
   ```
 
 - **`dags/reviews.csv`**: ไฟล์ข้อมูลรีวิวตัวอย่างที่ใช้ใน DAG `ai_spam_filter`
+
+---
+
+## ทดลองการแจ้งเตือน `messaging/`
+
+โปรเจกต์นี้รองรับการแจ้งเตือนผลการรันหรือส่งข้อความผ่านแอปพลิเคชัน **LINE** และ **Telegram**
+
+### การตั้งค่า secret สำหรับ messaging ฟยย
+
+สร้างไฟล์ `.env` ในโฟลเดอร์ `messaging/` (อ้างอิงรูปแบบจาก `.env.example`) เพื่อเก็บค่า Credentials:
+
+```env
+LINE_CHANNEL_ACCESS_TOKEN="YOUR_LINE_CHANNEL_ACCESS_TOKEN"
+LINE_TARGET_ID="YOUR_LINE_USER_OR_GROUP_ID"
+TELEGRAM_TOKEN="YOUR_TELEGRAM_BOT_TOKEN"
+TELEGRAM_CHAT_ID="YOUR_TELEGRAM_CHAT_ID"
+```
+
+### Testing scripts
+
+1. **`messaging/test_line.py`**:
+   - ส่งข้อความ (Push Notification) ไปยัง LINE Chat/Group ผ่าน LINE Messaging API (เนื่องจาก LINE Notify สิ้นสุดการให้บริการแล้ว)
+
+2. **`messaging/test_telegram.py`**:
+   - ส่งข้อความตรงหรือส่งเข้ากลุ่ม Telegram ด้วย Telegram Bot API ผ่าน HTTP Request (`requests`)
+
